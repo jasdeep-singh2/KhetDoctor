@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/KhetDoctor.Api/KhetDoctor.Api.csproj" />
+    <Project Path="src/KhetDoctor.AppHost/KhetDoctor.AppHost.csproj" />
+    <Project Path="src/KhetDoctor.ServiceDefaults/KhetDoctor.ServiceDefaults.csproj" />
+  </Folder>
+</Solution>
