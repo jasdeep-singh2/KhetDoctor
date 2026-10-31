@@ -1,41 +1,36 @@
+using KhetDoctor.Api.Inference;
+using Scalar.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.AddServiceDefaults();
 builder.Services.AddOpenApi();
+builder.Services.AddSingleton<DiseaseClassifier>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
+app.MapDefaultEndpoints();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+string[] allowedTypes = ["image/jpeg", "image/png", "image/webp"];
 
-app.MapGet("/weatherforecast", () =>
+app.MapPost("/api/diagnoses", async (IFormFile image, DiseaseClassifier classifier, CancellationToken ct) =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    if (image.Length is 0 or > 5_000_000)
+        return Results.BadRequest("Image must be between 1 byte and 5 MB.");
+    if (!allowedTypes.Contains(image.ContentType))
+        return Results.BadRequest("Only JPEG, PNG or WebP images are allowed.");
+
+    await using var stream = image.OpenReadStream();
+    var predictions = await classifier.PredictAsync(stream, ct: ct);
+    return Results.Ok(predictions);
 })
-.WithName("GetWeatherForecast");
+.DisableAntiforgery();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
