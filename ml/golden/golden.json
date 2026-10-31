@@ -1,0 +1,17 @@
+[
+  {
+    "file": "golden_0.jpg",
+    "top": "Tomato___Bacterial_spot",
+    "confidence": 0.9843182563781738
+  },
+  {
+    "file": "golden_1.jpg",
+    "top": "Tomato___Spider_mites Two-spotted_spider_mite",
+    "confidence": 0.953093945980072
+  },
+  {
+    "file": "golden_2.jpg",
+    "top": "Tomato___Septoria_leaf_spot",
+    "confidence": 0.9683008193969727
+  }
+]
