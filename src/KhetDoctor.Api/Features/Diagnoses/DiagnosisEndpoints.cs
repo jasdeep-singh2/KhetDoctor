@@ -30,7 +30,6 @@ public static class DiagnosisEndpoints
             return TypedResults.BadRequest("Image must be between 1 byte and 5 MB.");
         if (!AllowedTypes.Contains(image.ContentType))
             return TypedResults.BadRequest("Only JPEG, PNG or WebP images are allowed.");
-
         await using var stream = image.OpenReadStream();
         var predictions = await classifier.PredictAsync(stream, ct: ct);
         return TypedResults.Ok(predictions);
